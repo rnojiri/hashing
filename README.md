@@ -1,2 +1,2 @@
 # hashing
-A helper library to use create hashings from bytes.
+A utility to generate hashes using common cryptography algorithms.
