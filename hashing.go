@@ -39,15 +39,6 @@ const (
 
 	// SHAKE256 - constant
 	SHAKE256 Algorithm = "shake256"
-
-	// BLAKE2B384 - constant
-	// BLAKE2B384 Algorithm = "blake2b384"
-
-	// BLAKE2B256 - constant
-	// BLAKE2B256 Algorithm = "blake2b256"
-
-	// BLAKE2B512 - constant
-	// BLAKE2B512 Algorithm = "blake2b512"
 )
 
 // GenerateByteArray - generates a new byte array based on the given parameters
@@ -72,15 +63,10 @@ func GenerateByteArray(parameters ...interface{}) ([]byte, error) {
 	return result, nil
 }
 
-// generateHash - the main process
-func generateHash(h hash.Hash, parameters ...interface{}) ([]byte, error) {
+// generateHashFromByteArray - the main raw process
+func generateHashFromByteArray(h hash.Hash, byteArray []byte) ([]byte, error) {
 
-	byteArray, err := GenerateByteArray(parameters...)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = h.Write(byteArray)
+	_, err := h.Write(byteArray)
 	if err != nil {
 		return nil, err
 	}
@@ -88,15 +74,10 @@ func generateHash(h hash.Hash, parameters ...interface{}) ([]byte, error) {
 	return h.Sum(nil), nil
 }
 
-// generateShakeHash - the main process for shake hash
-func generateShakeHash(h sha3.ShakeHash, outputSize int, parameters ...interface{}) ([]byte, error) {
+// generateShakeHashFromByteArray - the main raw process for shake hash
+func generateShakeHashFromByteArray(h sha3.ShakeHash, outputSize int, byteArray []byte) ([]byte, error) {
 
-	byteArray, err := GenerateByteArray(parameters...)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = h.Write(byteArray)
+	_, err := h.Write(byteArray)
 	if err != nil {
 		return nil, err
 	}
@@ -110,63 +91,63 @@ func generateShakeHash(h sha3.ShakeHash, outputSize int, parameters ...interface
 	return output, nil
 }
 
+// generateHashUsingInterfaceParams - the main process
+func generateHashUsingInterfaceParams(h hash.Hash, parameters ...interface{}) ([]byte, error) {
+
+	byteArray, err := GenerateByteArray(parameters...)
+	if err != nil {
+		return nil, err
+	}
+
+	return generateHashFromByteArray(h, byteArray)
+}
+
+// generateShakeHashUsingInterfaceParams - the main process for shake hash
+func generateShakeHashUsingInterfaceParams(h sha3.ShakeHash, outputSize int, parameters ...interface{}) ([]byte, error) {
+
+	byteArray, err := GenerateByteArray(parameters...)
+	if err != nil {
+		return nil, err
+	}
+
+	return generateShakeHashFromByteArray(h, outputSize, byteArray)
+}
+
 // GenerateSHA256 - generates a sha256 hash based on the specified parameters
 func GenerateSHA256(parameters ...interface{}) ([]byte, error) {
 
-	return generateHash(sha256.New(), parameters...)
+	return generateHashUsingInterfaceParams(sha256.New(), parameters...)
 }
 
 // GenerateCRC32 - generates a sha256 hash based on the specified parameters
 func GenerateCRC32(parameters ...interface{}) ([]byte, error) {
 
-	return generateHash(crc32.NewIEEE(), parameters...)
+	return generateHashUsingInterfaceParams(crc32.NewIEEE(), parameters...)
 }
 
 // GenerateMD5 - generates a md5 hash based on the specified parameters
 func GenerateMD5(parameters ...interface{}) ([]byte, error) {
 
-	return generateHash(md5.New(), parameters...)
+	return generateHashUsingInterfaceParams(md5.New(), parameters...)
 }
 
 // GenerateSHA1 - generates a sha1 hash based on the specified parameters
 func GenerateSHA1(parameters ...interface{}) ([]byte, error) {
 
-	return generateHash(sha1.New(), parameters...)
+	return generateHashUsingInterfaceParams(sha1.New(), parameters...)
 }
 
 // GenerateSHAKE128 - generates a shake128 hash based on the specified parameters
 func GenerateSHAKE128(outputSize int, parameters ...interface{}) ([]byte, error) {
 
-	return generateShakeHash(sha3.NewShake128(), outputSize, parameters...)
+	return generateShakeHashUsingInterfaceParams(sha3.NewShake128(), outputSize, parameters...)
 }
 
 // GenerateSHAKE256 - generates a shake256 hash based on the specified parameters
 func GenerateSHAKE256(outputSize int, parameters ...interface{}) ([]byte, error) {
 
-	return generateShakeHash(sha3.NewShake256(), outputSize, parameters...)
+	return generateShakeHashUsingInterfaceParams(sha3.NewShake256(), outputSize, parameters...)
 }
-
-// GenerateBlake2b - generates a blacke2b hash based on the specified parameters
-// func GenerateBlake2b(blakeAlgorithm Algorithm, parameters ...interface{}) ([]byte, error) {
-
-// 	var h hash.Hash
-// 	var err error
-// 	switch blakeAlgorithm {
-// 	case BLAKE2B256:
-// 		h, err = blake2b.New256(nil)
-// 	case BLAKE2B512:
-// 		h, err = blake2b.New512(nil)
-// 	case BLAKE2B384:
-// 		h, err = blake2b.New384(nil)
-// 	default:
-// 		err = fmt.Errorf("available sizes: 256, 384 and 512")
-// 	}
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return generateHash(h, parameters...)
-// }
 
 // Generate - generates the hash using the selected algorithm
 func Generate(algorithm Algorithm, parameters ...interface{}) ([]byte, error) {
@@ -180,8 +161,6 @@ func Generate(algorithm Algorithm, parameters ...interface{}) ([]byte, error) {
 		return GenerateMD5(parameters...)
 	case CRC32:
 		return GenerateCRC32(parameters...)
-	// case BLAKE2B256, BLAKE2B384, BLAKE2B512:
-	// 	return GenerateBlake2b(algorithm, parameters)
 	default:
 		return nil, fmt.Errorf("no algorithm named %s", algorithm)
 	}
@@ -195,6 +174,74 @@ func GenerateSHAKE(algorithm Algorithm, outputSize int, parameters ...interface{
 		return GenerateSHAKE128(outputSize, parameters...)
 	case SHAKE256:
 		return GenerateSHAKE256(outputSize, parameters...)
+	default:
+		return nil, fmt.Errorf("no algorithm named %s", algorithm)
+	}
+}
+
+// Byte array
+
+// GenerateSHA256FromByteArray - generates a sha256 hash based on the specified parameters
+func GenerateSHA256FromByteArray(byteArray []byte) ([]byte, error) {
+
+	return generateHashFromByteArray(sha256.New(), byteArray)
+}
+
+// GenerateCRC32FromByteArray - generates a sha256 hash based on the specified parameters
+func GenerateCRC32FromByteArray(byteArray []byte) ([]byte, error) {
+
+	return generateHashFromByteArray(crc32.NewIEEE(), byteArray)
+}
+
+// GenerateMD5FromByteArray - generates a md5 hash based on the specified parameters
+func GenerateMD5FromByteArray(byteArray []byte) ([]byte, error) {
+
+	return generateHashFromByteArray(md5.New(), byteArray)
+}
+
+// GenerateSHA1FromByteArray - generates a sha1 hash based on the specified parameters
+func GenerateSHA1FromByteArray(byteArray []byte) ([]byte, error) {
+
+	return generateHashFromByteArray(sha1.New(), byteArray)
+}
+
+// GenerateSHAKE128FromByteArray - generates a shake128 hash based on the specified parameters
+func GenerateSHAKE128FromByteArray(outputSize int, byteArray []byte) ([]byte, error) {
+
+	return generateShakeHashFromByteArray(sha3.NewShake128(), outputSize, byteArray)
+}
+
+// GenerateSHAKE256FromByteArray - generates a shake256 hash based on the specified parameters
+func GenerateSHAKE256FromByteArray(outputSize int, byteArray []byte) ([]byte, error) {
+
+	return generateShakeHashFromByteArray(sha3.NewShake256(), outputSize, byteArray)
+}
+
+// GenerateFromByteArray - generates the hash using the selected algorithm
+func GenerateFromByteArray(algorithm Algorithm, byteArray []byte) ([]byte, error) {
+
+	switch algorithm {
+	case SHA256:
+		return GenerateSHA256FromByteArray(byteArray)
+	case SHA1:
+		return GenerateSHA1FromByteArray(byteArray)
+	case MD5:
+		return GenerateMD5FromByteArray(byteArray)
+	case CRC32:
+		return GenerateCRC32FromByteArray(byteArray)
+	default:
+		return nil, fmt.Errorf("no algorithm named %s", algorithm)
+	}
+}
+
+// GenerateSHAKEFromByteArray - generates the shake hash using the selected algorithm
+func GenerateSHAKEFromByteArray(algorithm Algorithm, outputSize int, byteArray []byte) ([]byte, error) {
+
+	switch algorithm {
+	case SHAKE128:
+		return GenerateSHAKE128FromByteArray(outputSize, byteArray)
+	case SHAKE256:
+		return GenerateSHAKE256FromByteArray(outputSize, byteArray)
 	default:
 		return nil, fmt.Errorf("no algorithm named %s", algorithm)
 	}
