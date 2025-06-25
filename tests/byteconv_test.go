@@ -3,8 +3,8 @@ package hashing_test
 import (
 	"testing"
 
+	"github.com/rnojiri/hashing"
 	"github.com/stretchr/testify/assert"
-	"github.com/uol/hashing"
 )
 
 /**

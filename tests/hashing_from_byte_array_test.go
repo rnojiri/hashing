@@ -1,81 +1,65 @@
 package hashing_test
 
 import (
-	"encoding/hex"
 	"testing"
 
 	"github.com/rnojiri/hashing"
-	"github.com/stretchr/testify/assert"
 )
 
-const (
-	testString = "hello world!"
-)
-
-// testResults - tests the results
-func testResults(t *testing.T, algorithm hashing.Algorithm, expectedResult string, result []byte, err error) {
-
-	if !assert.NoError(t, err, "error generating %s", algorithm) {
-		return
-	}
-
-	assert.Equal(t, expectedResult, hex.EncodeToString(result), "unexpected %s result", algorithm)
-}
-
-// TestSHA256 - tests the sha256 implementation
-func TestSHA256(t *testing.T) {
+// TestSHA256FromByteArray - tests the sha256 implementation
+func TestSHA256FromByteArray(t *testing.T) {
 
 	expected := "7509e5bda0c762d2bac7f90d758b5b2263fa01ccbc542ab5e3df163be08e6ca9"
 	algorithm := hashing.SHA256
 
-	results, err := hashing.GenerateSHA256(testString)
+	results, err := hashing.GenerateSHA256FromByteArray([]byte(testString))
 	testResults(t, algorithm, expected, results, err)
 
-	results, err = hashing.Generate(algorithm, testString)
+	results, err = hashing.GenerateFromByteArray(algorithm, []byte(testString))
 	testResults(t, algorithm, expected, results, err)
 }
 
-// TestSHA1 - tests the sha1 implementation
-func TestSHA1(t *testing.T) {
+// TestSHA1FromByteArray - tests the sha1 implementation
+func TestSHA1FromByteArray(t *testing.T) {
 
 	expected := "430ce34d020724ed75a196dfc2ad67c77772d169"
 	algorithm := hashing.SHA1
 
-	results, err := hashing.GenerateSHA1(testString)
+	results, err := hashing.GenerateSHA1FromByteArray([]byte(testString))
 	testResults(t, algorithm, expected, results, err)
 
-	results, err = hashing.Generate(algorithm, testString)
+	results, err = hashing.GenerateFromByteArray(algorithm, []byte(testString))
 	testResults(t, algorithm, expected, results, err)
 }
 
-// TestCRC32 - tests the crc32 implementation
-func TestCRC32(t *testing.T) {
+// TestCRC32FromByteArray - tests the crc32 implementation
+func TestCRC32FromByteArray(t *testing.T) {
 
 	expected := "03b4c26d"
 	algorithm := hashing.CRC32
 
-	results, err := hashing.GenerateCRC32(testString)
+	results, err := hashing.GenerateCRC32FromByteArray([]byte(testString))
 	testResults(t, algorithm, expected, results, err)
 
-	results, err = hashing.Generate(algorithm, testString)
+	results, err = hashing.GenerateFromByteArray(algorithm, []byte(testString))
 	testResults(t, algorithm, expected, results, err)
 }
 
-// TestMD5 - tests the md5 implementation
-func TestMD5(t *testing.T) {
+// TestMD5FromByteArray - tests the md5 implementation
+func TestMD5FromByteArray(t *testing.T) {
 
 	expected := "fc3ff98e8c6a0d3087d515c0473f8677"
 	algorithm := hashing.MD5
 
-	results, err := hashing.GenerateMD5(testString)
+	results, err := hashing.GenerateMD5FromByteArray([]byte(testString))
 	testResults(t, algorithm, expected, results, err)
 
-	results, err = hashing.Generate(algorithm, testString)
+	results, err = hashing.GenerateFromByteArray(algorithm, []byte(testString))
 	testResults(t, algorithm, expected, results, err)
 }
 
-// TestShake256 - tests the shake 256 implementation
-func TestShake256(t *testing.T) {
+// TestShake256FromByteArray - tests the shake 256 implementation
+func TestShake256FromByteArray(t *testing.T) {
 
 	size := []int{4, 8, 16, 32}
 	expectedHash := []string{
@@ -88,16 +72,16 @@ func TestShake256(t *testing.T) {
 
 	for i := 0; i < len(size); i++ {
 
-		results, err := hashing.GenerateSHAKE256(size[i], testString)
+		results, err := hashing.GenerateSHAKE256FromByteArray(size[i], []byte(testString))
 		testResults(t, algorithm, expectedHash[i], results, err)
 
-		results, err = hashing.GenerateSHAKE(algorithm, size[i], testString)
+		results, err = hashing.GenerateSHAKEFromByteArray(algorithm, size[i], []byte(testString))
 		testResults(t, algorithm, expectedHash[i], results, err)
 	}
 }
 
-// TestShake128 - tests the shake 128 implementation
-func TestShake128(t *testing.T) {
+// TestShake128FromByteArray - tests the shake 128 implementation
+func TestShake128FromByteArray(t *testing.T) {
 
 	size := []int{4, 8, 16, 32}
 	expectedHash := []string{
@@ -110,10 +94,10 @@ func TestShake128(t *testing.T) {
 
 	for i := 0; i < len(size); i++ {
 
-		results, err := hashing.GenerateSHAKE128(size[i], testString)
+		results, err := hashing.GenerateSHAKE128FromByteArray(size[i], []byte(testString))
 		testResults(t, algorithm, expectedHash[i], results, err)
 
-		results, err = hashing.GenerateSHAKE(algorithm, size[i], testString)
+		results, err = hashing.GenerateSHAKEFromByteArray(algorithm, size[i], []byte(testString))
 		testResults(t, algorithm, expectedHash[i], results, err)
 	}
 }
